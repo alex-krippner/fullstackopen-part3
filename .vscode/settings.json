@@ -1,0 +1,9 @@
+{
+
+    // fix: vscode was not autofixing eslint/prettier errors until added:
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true,
+      "source.fixAll": true
+    },
+    "editor.formatOnSave": false
+  }

@@ -1,12 +1,11 @@
 require('dotenv').config()
-const express = require('express');
-const app = express();
+const express = require('express')
+const app = express()
 const Person = require('./models/person')
 const morgan = require('morgan')
-const cors = require('cors');
-const { response } = require('express');
+const cors = require('cors')
 
-morgan.token('content', function(req, res) {
+morgan.token('content', function(req) {
   return JSON.stringify(req.body)
 })
 
@@ -15,53 +14,53 @@ app.use(express.json())
 app.use(cors())
 app.use(express.static('build'))
 
- 
+
 
 app.get('/', (req, res, next) => {
-    res.send('Welcome to your Phonebook')
-      .catch(error => next(error))
+  res.send('Welcome to your Phonebook')
+    .catch(error => next(error))
 })
 
 app.get('/api/persons', (req, res, next) => {
 
   Person.find({})
-    .then(persons => { 
+    .then(persons => {
       res.json(persons)
-      })
+    })
     .catch(error => next(error))
 
 })
-     
- 
+
+
 
 app.get('/info', (req, res, next) => {
-    const dateProcessed =  new Date() 
+  const dateProcessed =  new Date()
 
-    Person.find({}).then(persons => { 
-      res.send(`Phonebook has info for ${persons.length} people \n${dateProcessed}`)
-      })
-      .catch( error => next(error))
-    })
+  Person.find({}).then(persons => {
+    res.send(`Phonebook has info for ${persons.length} people \n${dateProcessed}`)
+  })
+    .catch( error => next(error))
+})
 
 
 
 app.get('/api/persons/:id', (req, res, next
-  ) => {
-    const { id } = req.params
-     Person.findById(id).then(person => {
-       if (person) {
-      res.status(200).json(person) 
+) => {
+  const { id } = req.params
+  Person.findById(id).then(person => {
+    if (person) {
+      res.status(200).json(person)
     } else {
       res.status(404).end()
     }
-    })
+  })
     .catch(error => next(error))
 
 })
 
 app.delete('/api/persons/:id', (req, res, next) => {
   Person.findByIdAndRemove(req.params.id)
-    .then(result => {
+    .then(res => {
       res.status(204).end()
     })
     .catch( error => next(error))
@@ -72,7 +71,7 @@ app.post('/api/persons', (req, res, next) => {
 
   const person = new Person({
     name: body.name,
-    number: body.number, 
+    number: body.number,
   })
 
   // if (!body.name) {
@@ -83,16 +82,16 @@ app.post('/api/persons', (req, res, next) => {
   //   return res.status(400).json({
   //     error: 'number is missing'
   //   })
-  // } 
+  // }
 
-  
+
   person
-  .save()
-  .then(savedPerson => savedPerson.toJSON())
-  .then( savedAndFormattedPerson => {
-    res.json(savedAndFormattedPerson)
-  })
-  .catch( error => next(error))
+    .save()
+    .then(savedPerson => savedPerson.toJSON())
+    .then( savedAndFormattedPerson => {
+      res.json(savedAndFormattedPerson)
+    })
+    .catch( error => next(error))
 
 
 })
@@ -104,17 +103,17 @@ app.put('/api/persons/:id', (req, res, next) => {
   const person =  {
     name: body.name,
     number: body.number,
-}
+  }
 
-  Person.findByIdAndUpdate(req.params.id, person, { new: true })    
-  .then( updatedPerson => {
-       res.json(updatedPerson)
-  })
-  .catch( error => next(error))
+  Person.findByIdAndUpdate(req.params.id, person, { new: true })
+    .then( updatedPerson => {
+      res.json(updatedPerson)
+    })
+    .catch( error => next(error))
 })
 
 const unknownEndpoint = (req, res) => {
-  res.status(404).send({ error: 'unknown endpoint '})
+  res.status(404).send({ error: 'unknown endpoint ' })
 }
 
 const errorHandler = (error, req, res, next) => {
@@ -123,7 +122,7 @@ const errorHandler = (error, req, res, next) => {
   if( error.name === 'CastError') {
     return res.status(400).send({ error: 'malformatted id' })
   } else if ( error.name === 'ValidationError') {
-    return res.status(400).json({ error: error.message})
+    return res.status(400).json({ error: error.message })
   }
 
   next(error)
@@ -131,8 +130,8 @@ const errorHandler = (error, req, res, next) => {
 
 app.use(errorHandler)
 app.use(unknownEndpoint)
-    
+
 const PORT = process.env.PORT
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
+  console.log(`Server running on port ${PORT}`)
 })
